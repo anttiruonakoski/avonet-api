@@ -3,7 +3,9 @@ import os
 from typing import Union
 
 from fastapi import FastAPI, Request
+from .database import SessionLocal, engine
 
+# browser side requests need ROOT_PATH to work on reverse_proxy, to correspond with server location
 app = FastAPI(root_path=os.environ.get('ROOT_PATH'))
 
 logging.basicConfig(
@@ -13,6 +15,14 @@ logging.basicConfig(
     handlers=[logging.FileHandler("avonet-api.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.get("/")
 def read_root(request: Request):
