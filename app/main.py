@@ -1,9 +1,10 @@
 import logging
+import os
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
-app = FastAPI()
+app = FastAPI(root_path=os.environ.get('ROOT_PATH'))
 
 logging.basicConfig(
     level=logging.INFO,
@@ -14,8 +15,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+def read_root(request: Request):
+    return {"Hello": "World", "root_path": request.scope.get("root_path")}
 
 
 @app.get("/items/{item_id}")
