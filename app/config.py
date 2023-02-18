@@ -1,7 +1,7 @@
 from pathlib import Path
 from decouple import config
 
-DB_FILE = config("DB_FILE", default="app.db")
+DB_FILE = config("DB_FILE", default="app1.db")
 DATA_DIR = Path(__file__).parent / "data"
 DATA_FILE = config("DATA_FILE", default="AVONET1_BirdLife.csv")
 
