@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from fastapi import FastAPI, Request, Depends, HTTPException
 from .database import SessionLocal, engine, create_database, get_db
-from .schema import BirdBase, BirdAll, get_bird_schema
+from .schema import BirdBase, get_bird_schema
 
 # from .models import ReflectedBird
 from app import api_read

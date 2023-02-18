@@ -38,9 +38,3 @@ def get_bird_schema() -> BaseModel:
 
 
 BirdBase = get_bird_schema()
-
-
-class BirdAll(BaseModel):
-    bird: List | None
-    class Config:
-        orm_mode = True

@@ -14,7 +14,7 @@ from .database import table_name, metadata, engine
 from sqlalchemy.ext.automap import automap_base
 
 
-def ReflectedBird():
+def ReflectedModel(classname):
     metadata.reflect(engine)
 
     # ... or just define our own Table objects with it (or combine both)
@@ -30,4 +30,4 @@ def ReflectedBird():
     # calling prepare() just sets up mapped classes and relationships.
     Base.prepare()
 
-    return Base.classes.bird
+    return getattr(Base.classes, classname)
