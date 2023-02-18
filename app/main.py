@@ -3,10 +3,8 @@ import os
 from typing import Union
 
 from fastapi import FastAPI, Request
-from .database import SessionLocal, engine
+from .database import SessionLocal, engine, create_database
 
-# browser side requests need ROOT_PATH to work on reverse_proxy, to correspond with server location
-app = FastAPI(root_path=os.environ.get('ROOT_PATH'))
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,6 +14,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+create_database()
+
+# browser side requests need ROOT_PATH to work on reverse_proxy, to correspond with server location
+app = FastAPI(root_path=os.environ.get("ROOT_PATH"))
+
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -23,6 +27,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 @app.get("/")
 def read_root(request: Request):
