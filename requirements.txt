@@ -17,3 +17,4 @@ websockets==10.4
 sqlalchemy==2.0.3
 pandas==1.5.3
 python-decouple==3.7
+fastapi-pagination==0.11.4

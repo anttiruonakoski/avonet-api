@@ -1,6 +1,9 @@
 import logging
 
 from sqlalchemy.orm import Session
+from sqlalchemy import select
+from fastapi_pagination.ext.sqlalchemy import paginate
+
 from .models import ReflectedModel
 
 # logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
@@ -14,7 +17,7 @@ def get_bird(db: Session, bird_id: int):
     return db.query(Bird).filter(Bird.id == bird_id).first()
 
 
-def get_all_birds(db: Session, limit):
+def get_all_birds(db: Session):
     Bird = ReflectedModel('bird')
     logger.debug(f"Retrieving all birds.")
-    return db.query(Bird).limit(limit).all()
+    return db.query(Bird).all()
