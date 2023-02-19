@@ -43,20 +43,7 @@ app = FastAPI(
 tags = metas.tags_metadata
 
 
-@app.get("/bird/{bird_id}", response_model=BirdBase, tags=["birds"])
-def get_bird(bird_id: int, db: Session = Depends(get_db)) -> BirdBase:
-    logger.info(f"Retrieving bird by id {bird_id}.")
-    bird = api_read.get_bird(db, bird_id=bird_id)
-
-    if bird is None:
-        logger.warning(f"bird not found by id {bird_id}.")
-        raise HTTPException(status_code=404, detail="Bird not found.")
-
-    logger.info(f"Successfully retrieved bird by id {bird_id}.")
-    return bird
-
-
-@app.get("/birds/", response_model=Page[BirdBase], tags=["birds"])
+@app.get("/birds", response_model=Page[BirdBase], tags=["birds"])
 def get_birds(params: Params = Depends(), db: Session = Depends(get_db)) -> any:
     logger.info(f"Retrieving birds paginated, page {params.page}")
     birds = api_read.get_all_birds(db, limit=None)
@@ -80,6 +67,19 @@ def get_all_birds(limit=None, db: Session = Depends(get_db)) -> any:
 
     logger.info(f"Successfully retrieved all birds to limit {limit}")
     return birds
+
+
+@app.get("/birds/{bird_id}", response_model=BirdBase, tags=["birds"])
+def get_bird(bird_id: int, db: Session = Depends(get_db)) -> BirdBase:
+    logger.info(f"Retrieving bird by id {bird_id}.")
+    bird = api_read.get_bird(db, bird_id=bird_id)
+
+    if bird is None:
+        logger.warning(f"bird not found by id {bird_id}.")
+        raise HTTPException(status_code=404, detail="Bird not found.")
+
+    logger.info(f"Successfully retrieved bird by id {bird_id}.")
+    return bird
 
 
 @app.get("/")
