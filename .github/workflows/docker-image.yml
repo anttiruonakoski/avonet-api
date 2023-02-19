@@ -15,4 +15,28 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: |
+        docker build . --file Dockerfile --tag ${{ vars.IMAGENAME }}
+        docker save ${{ vars.IMAGENAME }} | gzip > avonet_image.tar.gz
+    - name: scp docker image to server
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER  }}
+        key: ${{ secrets.SSH_PRIVKEY }}
+        port: ${{ secrets.SSH_PORT }} 
+        source: avonet_image.tar.gz
+        target: /opt/images/
+    - name: executing remote ssh commands
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER  }}
+        key: ${{ secrets.SSH_PRIVKEY }}
+        port: ${{ secrets.SSH_PORT }} 
+        script: |
+          docker load -i /opt/images/avonet_image.tar.gz
+          docker kill ${{ vars.CONTAINERNAME }}
+          docker rm ${{ vars.CONTAINERNAME }}
+          docker run -d -e ROOT_PATH=${{ vars.ROOT_PATH }} -e API_LAJI_FI_TOKEN='' --name ${{ vars.CONTAINERNAME }} -p 127.0.0.1:${{ vars.PORT }}:${{ vars.PORT }} ${{ vars.IMAGENAME }}
+          docker image prune -f
