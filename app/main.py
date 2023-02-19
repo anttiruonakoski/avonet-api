@@ -43,16 +43,29 @@ def get_bird(bird_id: int, db: Session = Depends(get_db)) -> BirdBase:
 
 
 @app.get("/birds/", response_model=Page[BirdBase])
-def get_all_birds(params: Params = Depends(), db: Session = Depends(get_db)) -> any:
-    logger.info(f"Retrieving all birds")
-    birds = api_read.get_all_birds(db)
+def get_birds(params: Params = Depends(), db: Session = Depends(get_db)) -> any:
+    logger.info(f"Retrieving birds paginated, page {params.page}")
+    birds = api_read.get_all_birds(db, limit=None)
 
     if birds is None:
         logger.warning(f"Birds not found")
         raise HTTPException(status_code=404, detail="Birds not found.")
 
-    logger.info(f"Successfully retrieved all birds")
+    logger.info(f"Successfully retrieved birds paginated, page {params.page}")
     return paginate(birds, params)
+
+
+@app.get("/birds/all", response_model=List[BirdBase])
+def get_all_birds(limit=None, db: Session = Depends(get_db)) -> any:
+    logger.info(f"Retrieving all birds")
+    birds = api_read.get_all_birds(db, limit=limit)
+
+    if birds is None:
+        logger.warning(f"Birds not found")
+        raise HTTPException(status_code=404, detail="Birds not found.")
+
+    logger.info(f"Successfully retrieved all birds to limit {limit}")
+    return birds
 
 
 @app.get("/")

@@ -17,7 +17,7 @@ def get_bird(db: Session, bird_id: int):
     return db.query(Bird).filter(Bird.id == bird_id).first()
 
 
-def get_all_birds(db: Session):
+def get_all_birds(db: Session, limit):
     Bird = ReflectedModel('bird')
-    logger.debug(f"Retrieving all birds.")
-    return db.query(Bird).all()
+    logger.debug(f"Retrieving birds, limit {limit}.")
+    return db.query(Bird).limit(limit).all()
