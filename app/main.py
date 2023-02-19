@@ -11,9 +11,10 @@ from .database import SessionLocal, engine, create_database, get_db
 from .schema import BirdBase, get_bird_schema
 from .api_pagination import Page, Params
 
-
 # from .models import ReflectedBird
 from app import api_read
+
+import app.metas as metas
 
 logging.basicConfig(
     level=logging.INFO,
@@ -26,10 +27,23 @@ logger = logging.getLogger(__name__)
 # print(list(inspect(bird).columns))
 
 # browser side requests need ROOT_PATH to work on reverse_proxy, to correspond with server location
-app = FastAPI(root_path=os.environ.get("ROOT_PATH"))
+app = FastAPI(
+    title="Bird data API",
+    description=metas.description,
+    version="0.1.0",
+    contact={
+        "email": "antti@ruonakoski.fi",
+    },
+    license_info={
+        "name": "Licence CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/",
+    },
+    root_path=os.environ.get("ROOT_PATH"),
+)
+tags = metas.tags_metadata
 
 
-@app.get("/bird/{bird_id}", response_model=BirdBase)
+@app.get("/bird/{bird_id}", response_model=BirdBase, tags=["birds"])
 def get_bird(bird_id: int, db: Session = Depends(get_db)) -> BirdBase:
     logger.info(f"Retrieving bird by id {bird_id}.")
     bird = api_read.get_bird(db, bird_id=bird_id)
@@ -42,7 +56,7 @@ def get_bird(bird_id: int, db: Session = Depends(get_db)) -> BirdBase:
     return bird
 
 
-@app.get("/birds/", response_model=Page[BirdBase])
+@app.get("/birds/", response_model=Page[BirdBase], tags=["birds"])
 def get_birds(params: Params = Depends(), db: Session = Depends(get_db)) -> any:
     logger.info(f"Retrieving birds paginated, page {params.page}")
     birds = api_read.get_all_birds(db, limit=None)
@@ -55,7 +69,7 @@ def get_birds(params: Params = Depends(), db: Session = Depends(get_db)) -> any:
     return paginate(birds, params)
 
 
-@app.get("/birds/all", response_model=List[BirdBase])
+@app.get("/birds/all", response_model=List[BirdBase], tags=["birds"])
 def get_all_birds(limit=None, db: Session = Depends(get_db)) -> any:
     logger.info(f"Retrieving all birds")
     birds = api_read.get_all_birds(db, limit=limit)
